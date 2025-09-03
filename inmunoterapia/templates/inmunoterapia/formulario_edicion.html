@@ -1,0 +1,114 @@
+<!-- formulario_edicion.html -->
+<form class="formulario" id="form-edicion" method="POST"
+      action="{% url 'inmunoterapia:guardar_edicion' paciente.IDSHARE %}">
+  {% csrf_token %}
+  <div class="modal-header text-white" style="background-color: rgba(0, 102, 154, 1);">
+    <h5 class="modal-title">Editar seguimiento</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+  </div>
+
+  <div class="modal-body">
+    <input type="hidden" name="id" value="{{ paciente.IDSHARE }}">
+
+
+    <!-- Información básica del paciente -->
+    <div class="row mb-2">
+      <div class="col-6"><strong>EPS:</strong></div>
+      <div class="col-6">{{ paciente.EPS}}</div>
+      <div class="col-6"><strong>Sede:</strong></div>
+      <div class="col-6">{{ paciente.SEDE}}</div>
+      <div class="col-6"><strong>Documento:</strong></div>
+      <div class="col-6">{{ paciente.DOCUMENTO}}</div>
+    </div>
+
+    <div class="row mb-2">
+      <div class="col-6"><strong>Nombre del paciente:</strong></div>
+      <div class="col-6">{{ paciente.NOMBRE_PACIENTE}}</div>
+      <div class="col-6"><strong>Edad:</strong></div>
+      <div class="col-6">{{ paciente.EDAD}}</div>
+      <div class="col-6"><strong>Teléfono:</strong></div>
+      <div class="col-6">{{ paciente.TELEFONO|default:''}}</div>
+    </div>
+    <div class="row mb-2">
+      <div class="col-6"><strong>HC Medicamento:</strong></div>
+      <div class="col-6">{{ paciente.HC_MEDICAMENTO|default:''}}</div>
+    </div>
+    <div class="row mb-2">
+      <div class="col-6"><strong>Fecha última vacuna:</strong></div>
+      <div class="col-6">{{ paciente.FECHA_ULTIMA_VACUNA|default:""}}</div>
+      <div class="col-6"><strong>Médico tratante:</strong></div>
+      <div class="col-6">{{ paciente.MEDICO_TRATANTE|default:''}}</div>
+      <div class="col-6"><strong>Dosis:</strong></div>
+      <div class="col-6">{{ paciente.DOSIS|default:''}}</div>
+    </div>
+
+    <div class="row mb-2">
+      <div class="col-6"><strong>Número de dosis aplicada:</strong></div>
+      <div class="col-6">{{ paciente.NUMERO_DOSIS_APLICADA|default:''}}</div>
+      <div class="col-6"><strong>Escala visual análoga de mejora:</strong></div>
+      <div class="col-6">{{ paciente.ESCALA_VISUAL_ANALOGA_MEJORIA|default:''}}</div>
+      <div class="col-6"><strong>Fecha último folio:</strong></div>
+      <div class="col-6">{{ paciente.FECHA_ULTIMO_FOLIO}}</div>
+      <div class="col-6"><strong>Próxima cita del paciente:</strong></div>
+      <div class="col-6">{{ paciente.FECHA_PROXIMA_CITA|default:''}}</div>
+    </div>
+
+    <div class="row mb-2">
+      <div class="col-6"><strong>Auxiliar que diligencia HC:</strong></div>
+      <div class="col-6">{{ paciente.AUXILIAR_RESPONSABLE|default:'' }}</div>
+      <div class="col-6">
+        <label class="form-label"><strong>Registro de adherencia:</strong></label>
+        <select name="registro_adherencia" id="id_registro_adherencia" class="form-select" required>
+          <option value="">Seleccione</option>
+          {% for opcion in adherente %}
+          <option value="{{ opcion }}" {% if paciente.REGISTRO_ADHERENCIA|default:'' == opcion %}selected{% endif %}>
+            {{ opcion }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6">
+        <label class="form-label"><strong>No Adherencia:</strong></label>
+        <select name="no_adherencia" id="select_no_adherencia" class="form-select" required>
+          <option value=""></option>
+          {% for opcion in adherencias %}
+          <option value="{{ opcion }}" {% if paciente.NO_ADHERENCIA|default:'' == opcion %}selected{% endif %}>
+            {{ opcion }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-2">
+      <div class="col-6">
+        <label class="form-label"><strong>Clasificación de tratamiento: </strong></label>
+        <input type="text" class="estado_clasificacion form-control" value="{{ paciente.CLASIFICACION_TRATAMIENTO }}" readonly>
+      </div>
+      <div class="col-6"><strong>Usuario seguimiento</strong></div>
+      <div class="col-6">{{ paciente.MODIFICADO_POR|default:'' }}</div>
+    </div>
+
+    <!-- Clasificación y observaciones -->
+    <div class="row mb-2">
+      <div class="col-6">
+        <label class="form-label"><strong>Observaciones de no adherencia del paciente: </strong></label>
+        <textarea id="observaciones" name="observaciones" class="form-control">{{ paciente.OTROS|default:'' }}</textarea>
+      </div>
+    </div>
+  </div>
+<div class="modal-footer modal-footer2 d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <label class="switch me-2">
+        <input type="checkbox" id="estadoSwitch">
+        <span class="slider round"></span>
+      </label>
+      <span id="estadoTexto">
+        Estado del Tratamiento: {{ paciente.FINALIZACION_TRATAMIENTO|default:"" }}
+      </span>
+      <input type="hidden" name="FINALIZACION_TRATAMIENTO" id="estadoHidden" 
+             value="{{ paciente.FINALIZACION_TRATAMIENTO }}">
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</div>
+</form>

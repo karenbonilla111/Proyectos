@@ -1,0 +1,84 @@
+{%load humanize%}
+
+<div class="modal-header text-white" style="background-color: rgba(0, 102, 154, 1);">
+    <h5 class="modal-title">Seguimiento</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body historico-body">
+    {% if historial %}
+        {% for h in historial %}
+        <div class="mb-3 p-3 border rounded shadow-sm bg-light">
+            <div class="row mb-2">
+                <div class="col-6"><strong>FOLIO</strong></div>
+                <div class="col-6">{{ h.FOLIO }}</div>
+                <div class="col-6"><strong>FECHA FOLIO</strong></div>
+                <div class="col-6">{{ h.FECHA_FOLIO }}</div>
+                <div class="col-6"><strong>MES FOLIO</strong></div>
+                <div class="col-6">{{ h.MES_FOLIO }}</div>
+                <div class="col-6"><strong>AÑO FOLIO</strong></div>
+                <div class="col-6">{{ h.AÑO_FOLIO }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6"><strong>DOCUMENTO</strong></div>
+                <div class="col-6">{{ h.DOCUMENTO }}</div>
+                <div class="col-6"><strong>SEDE</strong></div>
+                <div class="col-6">{{ h.SEDE }}</div>
+                <div class="col-6"><strong>ACTIVIDAD</strong></div>
+                <div class="col-6">{{ h.ACTIVIDAD }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6"><strong>CODIGO DIAGNOSTICO</strong></div>
+                <div class="col-6">{{ h.CODIGO_DIGNOSTICO }}</div>
+                <div class="col-6"><strong>DIAGNOSTICO</strong></div>
+                <div class="col-6">{{ h.DIAGNOSTICO|default:"" }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6"><strong>PRUEBA PRICK</strong></div>
+                <div class="col-6">{{ h.PRUEBA_PRICK}}</div>
+                <div class="col-6"><strong>PRUEBA PARCHE ALIMENTOS MEDICAMENTOS</strong></div>
+                <div class="col-6">{{ h.PRUEBA_PARCHE_ALIMENTOS_MEDICAMENTOS }}</div>
+                <div class="col-6"><strong>PRUEBA ALIMENTOS MENORES A 2 AÑOS</strong></div>
+                <div class="col-6">{{ h.PRUEBA_ALIMENTOS_MENORES_A_2_AÑOS }}</div>
+                <div class="col-6"><strong>PRUEBA PARCHE BATERIA ESTANDAR</strong></div>
+                <div class="col-6">{{ h.PRUEBA_PARCHE_BATERIA_ESTANDAR }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6"><strong>PRUEBA CUTANEA AEROALERGENOS</strong></div>
+                <div class="col-6">{{ h.PRUEBA_CUTANEA_AEROALERGENOS }}</div>
+                <div class="col-6"><strong>PRUEBA CUTANEA ALIMENTOS</strong></div>
+                <div class="col-6">{{ h.PRUEBA_CUTANEA_ALIMENTOS }}</div>
+                <div class="col-6"><strong>PRUEBA PROVOCACION MEDICAMENTO</strong></div>
+                <div class="col-6">{{ h.PRUEBA_PROVOCACION_MEDICAMENTO }}</div>
+                <div class="col-6"><strong>PRUEBA PROVOCACION ALIMENTO</strong></div>
+                <div class="col-6">{{ h.PRUEBA_PROVOCACION_ALIMENTO }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6"><strong>INMUNOTERAPIA</strong></div>
+                <div class="col-6">{{ h.INMUNOTERAPIA }}</div>
+                <div class="col-6"><strong>MEDICAMENTO</strong></div>
+                <div class="col-6">{{ h.MEDICAMENTOS_INMUNOTERAPIA|default:"" }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6"><strong>TRATAMIENTO FARMACOLOGICO</strong></div>
+                <div class="col-6">{{ h.TRATAMIENTO_FARMACOLOGICO|default:"" }}</div>
+                <div class="col-6"><strong>FECHA DE ULTIMA INMUNOTERAPIA</strong></div>
+                <div class="col-6">{{ h.FECHA_ULTIMA_INMUNOTERAPIA|default:"" }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6"><strong>RESOLUCION PACIENTE</strong></div>
+                <div class="col-6">{{ h.RESOLUCION_PACIENTE|default:"" }}</div>
+                <div class="col-6"><strong>CLASIFICACION</strong></div>
+                <div class="col-6">{{ h.CLASIFICACION|default:"" }}</div>
+                <div class="col-6"><strong>USUARIO INVITADO</strong></div>
+                <div class="col-6">{{ h.USUARIO_INVITADO|default:"" }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6"><strong>OBSERVACIONES GENERALES</strong></div>
+                <div class="col-6">{{ h.OBSERVACIONES_GENERALES|default:"" }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+            <div class="alert alert-light">NO HAY DATOS DISPONIBLES</div>
+    {% endif %}
+</div>

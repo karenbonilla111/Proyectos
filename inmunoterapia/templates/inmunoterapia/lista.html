@@ -1,0 +1,493 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block footer %}{% endblock %}
+{% block title %}Inicio Inmunoterapia{% endblock %}
+
+{% block content %}
+{% load custom_filters %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="{% static 'css/lista_inm.css' %}" rel="stylesheet">
+<link href="{% static 'css/historico_inmuno.css' %}" rel="stylesheet">
+<link href="{% static 'css/editar_form_inmuno.css' %}" rel="stylesheet">
+<div class="inicio-header">
+    <h4>Pacientes Inmunoterapia</h4>
+    <div class="acciones-header">
+        <a href="{% url 'inmunoterapia:inicio_inmunoterapia' %}" class="button-limpiar">
+            <i class="bi bi-house"></i> INICIO
+        </a>
+    </div>
+</div>
+<div class="filter-container">
+    <form method="get" class="filtros-form-4">
+        <div class="filtro-grupo-4">
+            <label for="documento">DOCUMENTO</label>
+            <input type="text" name="documento" placeholder="Buscar identificación" value="{{ request.GET.documento }}">
+        </div>
+        <div class="filtro-grupo-4">
+            <label for="anio">AÑO</label>
+            <select name="anio" id="anio">
+                <option value="">Todos</option>
+                {% for a in anios %}
+                <option value="{{ a }}" {% if request.GET.anio == a|stringformat:"s" %}selected{% endif %}>{{ a }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filtro-grupo-4">
+            <label for="mes">MES</label>
+            <select name="mes" id="mes">
+                <option value="">Todos</option>
+                {% for m in meses %}
+                <option value="{{ m }}" {% if request.GET.mes == m|stringformat:"s" %}selected{% endif %}>
+                    {{ meses_nombres|get_item:m }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filtro-grupo-4">
+            <label for="sede">SEDE</label>
+            <select name="sede" id="sede">
+                <option value="">Todas las sedes</option>
+                {% for s in sedes %}
+                <option value="{{ s }}" {% if request.GET.sede == s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filtro-grupo-4">
+            <label for="finalizacion">ESTADO FINALIZACIÓN DEL TRATAMIENTO</label>
+            <select name="finalizacion" id="finalizacion">
+                <option value="">Todas</option>
+                {% for f in finalizaciones %}
+                <option value="{{ f }}" {% if request.GET.finalizacion == f %}selected{% endif %}>{{ f }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filtro-grupo-4">
+            <label for="clasificacion">CLASIFICACIÓN</label>
+            <select name="clasificacion" id="clasificacion">
+                <option value="">Todas</option>
+                {% for c in clasificaciones %}
+                <option value="{{ c }}" {% if request.GET.clasificacion == c %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filtro-grupo-4">
+            <label for="paciente_adherente">PACIENTE ADHERENTE</label>
+            <select name="paciente_adherente" id="paciente_adherente">
+                <option value="">Todos</option>
+                {% for f in adherente %}
+                <option value="{{ f }}" {% if request.GET.paciente_adherente == f %}selected{% endif %}>{{ f }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filtro-grupo-4">
+            <label for="no_adherencia">MOTIVO NO ADHERENCIA</label>
+            <select name="no_adherencia" id="no_adherencia">
+                <option value="">Todos</option>
+                {% for a in adherencias %}
+                <option value="{{ a }}" {% if request.GET.no_adherencia == a %}selected{% endif %}>{{ a }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filtro-grupo-4">
+            <button class="button-buscar" type="submit">
+                <i class="fas fa-search me-1"></i>BUSCAR
+            </button>
+        </div>
+        <div class="filtro-grupo-4">
+            <a href="{% url 'inmunoterapia:lista_inmunoterapia' %}" class="button-limpiar">
+                <i class="fas fa-eraser me-1"></i> LIMPIAR FILTROS
+            </a>
+        </div>
+    </form>
+</div>
+    <div class="pagination">
+        <span class="step-links">
+            {% if pacientes.has_previous %}
+            <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page=1"><<</a>
+            <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ pacientes.previous_page_number }}"><</a>
+            {% endif %}
+            <span class="current">
+                Página {{ pacientes.number }} de {{ pacientes.paginator.num_pages }}
+            </span>
+            {% if pacientes.has_next %}
+            <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ pacientes.next_page_number }}">></a>
+            <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ pacientes.paginator.num_pages }}">>></a>
+            {% endif %}
+        </span>
+    </div>
+<div class="panel-inmu">
+    <div class="tabla-scroll">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>FECHA ULTIMO FOLIO</th>
+                    <th>DOCUMENTO</th>
+                    <th>PACIENTE</th>
+                    <th>SEDE</th>
+                    <th>VACUNA</th>
+                    <th>DOSIS</th>
+                    <th>TELÉFONO</th>
+                    <th>PRÓXIMA CITA</th>
+                    <th>USUARIO SEGUIMIENTO</th>
+                    <th>ADHERENTE</th>
+                    <th>FINALIZACIÓN TRATAMIENTO</th>
+                    <th>MOTIVO NO ADHERENCIA</th>
+                    <th>CLASIFICACIÓN</th>
+                    <th>SEGUIMIENTO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in pacientes %}
+                <tr>
+                    <td>{{p.FECHA_ULTIMO_FOLIO|default:""}}</td>
+                    <td>{{ p.DOCUMENTO }}</td>
+                    <td>{{ p.NOMBRE_PACIENTE }}</td>
+                    <td>{{ p.SEDE|upper }}</td>
+                    <td>{{p.HC_MEDICAMENTO}}</td>
+                    <td>{{p.NUMERO_DOSIS_APLICADA|default:""}}</td>
+                    <td>{{p.TELEFONO}}</td>
+                    <td>{{p.FECHA_PROXIMA_CITA|default:""}}</td>
+                    <td>{{p.MODIFICADO_POR|default:""}}</td>
+                    <td>{{p.REGISTRO_ADHERENCIA|default:""}}</td>
+                    <td>{{ p.FINALIZACION_TRATAMIENTO }}</td>
+                    <td>{{ p.NO_ADHERENCIA|default:"" }}</td>
+                    <td>{{ p.CLASIFICACION_TRATAMIENTO }}</td>
+                    <td>
+                        <button href="#" class="btn-acciones btn-ver-icon" data-id="{{ p.IDSHARE }}" title="Ver seguimiento">
+                            <i class="bi bi-eye-fill"></i>
+                        </button>
+                        {%if p.CLASIFICACION_TRATAMIENTO == "Clasificado" %}
+                        {% if perms.inmunoterapia.editar_inmunoterapia %}
+                        <button href="#" class="btn-acciones btn-editar-seguimiento" data-id="{{ p.IDSHARE }}" title="Editar seguimiento">
+                            <i class="bi bi-pen"></i>
+                        </button>
+                        {%endif%}
+                        {%endif%}
+                        {%if p.CLASIFICACION_TRATAMIENTO == "No clasificado" %}
+                        {% if perms.inmunoterapia.agregar_inmunoterapia %}
+                        <button href="#" class="btn-acciones btn-agregar-seguimiento" data-id="{{ p.IDSHARE }}" title="Agregar seguimiento">
+                          <i class="bi bi-person-add"></i>
+                        </button>
+                        {%endif%}
+                        {%endif%}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="14" style="text-align: center;">No se encontraron resultados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="modalHistorial" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <!-- Aquí se insertará el historial con JavaScript -->
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modalEdicion" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <!-- Contenido del formulario por AJAX -->
+    </div>
+  </div>
+</div>
+<!-- Modal para agregar seguimiento -->
+<!-- Modal Agregar -->
+<div class="modal fade" id="modalAgregarSeguimiento" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" id="modalContentSeguimiento">
+      <!-- Aquí se inyecta el render_to_string -->
+    </div>
+  </div>
+</div>
+<!-- Al final del template -->
+<script>
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-ver-icon');
+    if (btn) {
+        e.preventDefault();
+        const IDSHARE = btn.getAttribute('data-id');
+        if (!IDSHARE) return;
+
+        const url = `/inmunoterapia/historico/${IDSHARE}/`;
+        const modalContentElement = document.querySelector("#modalHistorial .modal-content");
+
+        // Muestra el loader temporal mientras llega la respuesta
+        modalContentElement.innerHTML = `
+            <div class="modal-body text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-3">Cargando historial...</p>
+            </div>
+        `;
+
+        // Llamado AJAX para traer el contenido
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    modalContentElement.innerHTML = data.html;
+
+                    const modalElement = document.getElementById("modalHistorial");
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);  // Usamos getOrCreateInstance
+                    modal.show();
+                } else {
+                    alert(data.message || "No se pudo cargar el historial.");
+                }
+            })
+            .catch(err => {
+                console.error("Error en fetch:", err);
+                alert("Ocurrió un error al cargar el historial.");
+            });
+    }
+});
+</script>
+<script>
+document.addEventListener("shown.bs.modal", function(e) {
+    // Solo actuamos si el modal contiene el switch
+    const root = e.target;
+    const toggle = root.querySelector('#estadoSwitch');
+    const texto  = root.querySelector('#estadoTexto');
+    const hidden = root.querySelector('#estadoHidden');
+
+    if (!toggle || !texto || !hidden) return;
+
+    // Leer el valor actual del hidden (más seguro que usar la plantilla)
+    let estado = (hidden.value || "").trim().toLowerCase();
+
+    // Inicializar
+    aplicarEstado(estado.includes("seguimiento"));
+
+    // Escuchar cambios
+    toggle.addEventListener("change", function() {
+        aplicarEstado(toggle.checked);
+    });
+
+    function aplicarEstado(checked) {
+        toggle.checked = checked;
+        texto.textContent = "Estado del Tratamiento : " + (checked ? "En seguimiento" : "Finalizado");
+        texto.style.color = "#000";
+        hidden.value = checked ? "En seguimiento" : "Finalizado";
+    }
+});
+</script>
+<script>
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-editar-seguimiento');
+    if (btn) {
+        e.preventDefault();
+        const IDSHARE = btn.getAttribute('data-id');
+        if (!IDSHARE) return;
+
+        const url = `/inmunoterapia/cargar-edicion/${IDSHARE}/`;
+        const modalContentElement = document.querySelector("#modalEdicion .modal-content");
+
+        modalContentElement.innerHTML = `
+            <div class="modal-body text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-3">Cargando formulario...</p>
+            </div>
+        `;
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    modalContentElement.innerHTML = data.html;
+                    const modalElement = document.getElementById("modalEdicion");
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+                    modal.show();
+                    inicializarEventosEdicion();
+                } else {
+                    alert("Error al cargar formulario");
+                }
+            })
+            .catch(err => console.error("Error en fetch:", err));
+    }
+});
+function inicializarEventosEdicion() {
+    const registroAdherencia = document.getElementById("id_registro_adherencia");
+    const selectNoAdherencia = document.getElementById("select_no_adherencia");
+    const observaciones = document.getElementById("observaciones");
+    const clasificacion = document.querySelector(".estado_clasificacion");
+    const switchEstado = document.getElementById("estadoSwitch");
+    const estadoTexto = document.getElementById("estadoTexto");
+    const estadoHidden = document.getElementById("estadoHidden");
+    const form = document.getElementById("form-edicion");
+
+    const estadoActual = (estadoHidden.value || "").toLowerCase();
+
+    function actualizarCampos() {
+        const val = (registroAdherencia.value || "").toLowerCase();
+        selectNoAdherencia.disabled = true;
+        observaciones.disabled = true;
+        clasificacion.value = "No clasificado";
+
+        if (val === "si") {
+            clasificacion.value = "Clasificado";
+        } else if (val === "no") {
+            selectNoAdherencia.disabled = false;
+            observaciones.disabled = false;
+            clasificacion.value = "Clasificado";
+        } else if (val === "no aplica") {
+            observaciones.disabled = false;
+            clasificacion.value = "Clasificado";
+        }
+    }
+
+    registroAdherencia.addEventListener("change", actualizarCampos);
+    actualizarCampos();
+
+    // Manejar switch
+    switchEstado.addEventListener("change", function () {
+        if (this.checked) {
+            estadoTexto.textContent = "Estado del Tratamiento: En seguimiento";
+            estadoHidden.value = "En seguimiento";
+        } else {
+            estadoTexto.textContent = "Estado del Tratamiento: Finalizado";
+            estadoHidden.value = "Finalizado";
+        }
+    });
+
+    // **Bloquear todo si está Finalizado**
+    if (estadoActual === "finalizado") {
+        registroAdherencia.disabled = true;
+        selectNoAdherencia.disabled = true;
+        observaciones.disabled = true;
+        switchEstado.disabled = true;
+        form.querySelector("button[type='submit']").disabled = true;
+
+        estadoTexto.textContent = "Estado del Tratamiento: Finalizado (No editable)";
+        estadoTexto.style.color = "red";
+    }
+
+    // Envío AJAX del formulario
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (estadoActual === "finalizado") {
+            alert("El tratamiento está finalizado, no se puede editar.");
+            return;
+        }
+
+        const url = form.action;
+        const formData = new FormData(form);
+
+        fetch(url, {
+            method: "POST",
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Seguimiento actualizado correctamente");
+                location.reload(); // O actualizar fila sin recargar
+            } else {
+                alert(data.msg || "Error al guardar");
+            }
+        })
+        .catch(err => {
+            console.error("Error en fetch:", err);
+            alert("Error al guardar");
+        });
+    });
+}
+</script>
+<script>
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-agregar-seguimiento');
+    if (btn) {
+        e.preventDefault();
+        const IDSHARE = btn.getAttribute('data-id');
+        if (!IDSHARE) return;
+
+        const url = `/inmunoterapia/cargar-agregar/${IDSHARE}/`;
+        const modalContentElement = document.querySelector("#modalAgregarSeguimiento .modal-content");
+
+        modalContentElement.innerHTML = `
+            <div class="modal-body text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-3">Cargando formulario...</p>
+            </div>
+        `;
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    modalContentElement.innerHTML = data.html;
+                    const modalElement = document.getElementById("modalAgregarSeguimiento");
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+                    modal.show();
+
+                    // Inicializar lógica de agregar
+                    inicializarEventosAgregar();
+                } else {
+                    alert("❌ Error al cargar formulario");
+                }
+            })
+            .catch(err => console.error("Error en fetch:", err));
+    }
+});
+
+function inicializarEventosAgregar() {
+    const registroAdherencia = document.getElementById("id_registro_adherencia");
+    const selectNoAdherencia = document.getElementById("select_no_adherencia");
+    const observaciones = document.getElementById("observaciones");
+    const clasificacion = document.querySelector(".estado_clasificacion");
+    const form = document.getElementById("form-agregar");
+
+    function actualizarCampos() {
+        const val = (registroAdherencia.value || "").toLowerCase();
+
+        // Bloquear todo por defecto
+        selectNoAdherencia.disabled = true;
+        observaciones.disabled = true;
+        clasificacion.value = "No clasificado";
+
+        if (val === "si") {
+            clasificacion.value = "Clasificado";
+        } else if (val === "no") {
+            selectNoAdherencia.disabled = false;
+            observaciones.disabled = false;
+            clasificacion.value = "Clasificado";
+        } else if (val === "no aplica") {
+            observaciones.disabled = false;
+            clasificacion.value = "Clasificado";
+        }
+    }
+
+    registroAdherencia.addEventListener("change", actualizarCampos);
+    actualizarCampos();
+
+    // Envío AJAX
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const url = form.action;
+        const formData = new FormData(form);
+
+        fetch(url, {
+            method: "POST",
+            body: formData,
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert("✅ Seguimiento agregado correctamente");
+                location.reload();
+            } else {
+                alert("❌ " + (data.msg || "Error al guardar"));
+            }
+        })
+        .catch(err => {
+            console.error("Error en fetch:", err);
+            alert("❌ Error al guardar");
+        });
+    });
+}
+</script>
+{% endblock %}

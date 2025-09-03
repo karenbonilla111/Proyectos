@@ -1,0 +1,77 @@
+{% load humanize %}
+
+<div class="modal-header text-white" style="background-color: rgba(0, 102, 154, 1);">
+    <h5 class="modal-title">Resumen seguimiento</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body historico-body">
+    {% if historico %}
+        {% for h in historico %}
+        <div class="mb-3 p-3 border rounded shadow-sm bg-light">
+            <div class="row mb-2">
+                <div class="col-6"><strong>EPS</strong></div>
+                <div class="col-6">{{ h.EPS }}</div>
+                <div class="col-6"><strong>SEDE</strong></div>
+                <div class="col-6">{{ h.SEDE }}</div>
+                <div class="col-6"><strong>DOCUMENTO</strong></div>
+                <div class="col-6 text-success">{{ h.DOCUMENTO }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6"><strong>NOMBRE PACIENTE</strong></div>
+                <div class="col-6 text-success">{{ h.NOMBRE_PACIENTE }}</div>
+                <div class="col-6"><strong>EDAD</strong></div>
+                <div class="col-6 text-success">{{ h.EDAD }}</div>
+                <div class="col-6"><strong>TELEFONO</strong></div>
+                <div class="col-6 text-success">{{ h.TELEFONO }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6"><strong>HC MEDICAMENTO</strong></div>
+                <div class="col-6 text-success">{{ h.HC_MEDICAMENTO|default:"" }}</div>
+                <div class="col-6"><strong>FECHA ULTIMA VACUNA</strong></div>
+                <div class="col-6 text-success">{{ h.FECHA_ULTIMA_VACUNA|default:"" }}</div>
+                <div class="col-6"><strong>MÉDICO TRATANTE</strong></div>
+                <div class="col-6 text-success">{{ h.MEDICO_TRATANTE|default:"" }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6"><strong>DOSIS</strong></div>
+                <div class="col-6 text-success">{{ h.DOSIS|default:"" }}</div>
+                <div class="col-6"><strong>NÚMERO DE DOSIS APLICADA</strong></div>
+                <div class="col-6 text-success">{{ h.NUMERO_DOSIS_APLICADA|default:"" }}</div>
+                <div class="col-6"><strong>ESCALA VISUAL ANÁLOGA DE MEJORA</strong></div>
+                <div class="col-6 text-success">{{ h.ESCALA_VISUAL_ANALOGA_MEJORIA|default:"" }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6"><strong>FECHA ULTIMO FOLIO</strong></div>
+                <div class="col-6 text-success">{{ h.FECHA_ULTIMO_FOLIO|default:"" }}</div>
+                <div class="col-6"><strong>PRÓXIMA CITA DEL PACIENTE</strong></div>
+                <div class="col-6 text-success">{{ h.FECHA_PROXIMA_CITA|default:"" }}</div>
+                <div class="col-6"><strong>AUXILIAR QUE DILIGENCIA HC</strong></div>
+                <div class="col-6 text-success">{{ h.AUXILIAR_RESPONSABLE|default:"" }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6"><strong>REGISTRO DE ADHERENCIA</strong></div>
+                <div class="col-6 text-success">{{ h.REGISTRO_ADHERENCIA|default:"" }}</div>
+                <div class="col-6"><strong>NO ADHERENCIA</strong></div>
+                <div class="col-6 text-success">{{ h.NO_ADHERENCIA|default:"" }}</div>
+                <div class="col-6"><strong>CLASIFICACIÓN DE TRATAMIENTO</strong></div>
+                <div class="col-6 text-success">{{ h.CLASIFICACION_TRATAMIENTO|default:"" }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-6"><strong>USUARIO SEGUIMIENTO</strong></div>
+                <div class="col-6 text-success">{{ h.MODIFICADO_POR|default:"" }}</div>
+                <div class="col-6"><strong>OBSERVACIONES DE NO ADHERENCIA DEL PACIENTE</strong></div>
+                <div class="col-6 text-success">{{ h.OTROS|default:"" }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-light">No hay seguimiento registrado.</div>
+    {% endif %}
+</div>
+{% if historico %}
+{% for h in historico %}
+<div class="modal-footer" style="justify-content: flex-start;">
+    <div class="col-6"><strong style="white-space: nowrap;">ESTADO DEL TRATAMIENTO:  {{ h.FINALIZACION_TRATAMIENTO|default:"" }}</strong></div>
+</div>
+{%endfor %}
+{% endif %}

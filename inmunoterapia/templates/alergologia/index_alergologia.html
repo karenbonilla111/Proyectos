@@ -1,0 +1,504 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block footer %}{% endblock %}
+{% block title %}Inicio Alergología{% endblock %}
+
+{% block content %}
+{% load custom_filters %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="{% static 'css/index_alergologia.css' %}">
+<link rel="stylesheet" href="{% static 'css/historial_alergologia.css' %}">
+<link rel="stylesheet" href="{% static 'css/css_alergologia.css' %}">
+
+<!-- 🔹 Contenedor de notificación -->
+<div id="notificacion" class="alert alert-success text-center d-none" role="alert"
+     style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 1055; width: 400px;">
+</div>
+
+<div class="inicio-header">
+    <h4>Pacientes Alergología</h4>
+    <div class="acciones-header">
+        <a href="{% url 'inmunoterapia:inicio_inmunoterapia' %}" class="button-limpiar">
+            <i class="bi bi-house"></i> INICIO
+        </a>
+    </div>
+</div>
+<div class="filter-container">
+    <form method="get" class="filtros-form-4">
+        <div class="filtro-grupo-4">
+            <label for="documento">DOCUMENTO</label>
+            <input type="text" name="documento" placeholder="Buscar identificación" value="{{ request.GET.documento }}" class="filtro-input">
+        </div>
+        <div class="filtro-grupo-4">
+            <label for="anio">AÑO</label>
+            <select name="anio" id="anio" class="filtro-input">
+                <option value="">Todos</option>
+                {% for a in anio %}
+                <option value="{{ a }}" {% if request.GET.anio == a|stringformat:"s" %}selected{% endif %}>{{ a }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filtro-grupo-4">
+            <label for="mes">MES</label>
+            <select name="mes" id="mes" class="filtro-input">
+                <option value="">Todos</option>
+                {% for m in mes %}
+                <option value="{{ m }}" {% if request.GET.mes == m|stringformat:"s" %}selected{% endif %}>
+                    {{ m|upper }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filtro-grupo-4">
+            <label for="actividad">ACTIVIDAD</label>
+            <select name="actividad" id="actividad" class="filtro-input">
+                <option value="">Todas las actividades</option>
+                {% for s in actividad %}
+                <option value="{{ s }}" {% if request.GET.sede == s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filtro-grupo-4">
+            <label for="resolucion_paciente">RESOLUCIÓN PACIENTE</label>
+            <select name="resolucion_paciente" id="resolucion_paciente" class="filtro-input">
+                <option value="">Todos</option>
+                {% for f in resolucion_paciente %}
+                <option value="{{ f }}" {% if request.GET.resolucion_paciente == f %}selected{% endif %}>{{ f }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filtro-grupo-4">
+            <label for="clasificaciones">CLASIFICACIÓN</label>
+            <select name="clasificacion" id="clasificaciones" class="filtro-input">
+                <option value="">Todos</option>
+                {% for c in clasificacion %}
+                <option value="{{ c }}" {% if request.GET.clasificacion == c %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filtro-grupo-4">
+            <label for="sedes">SEDE</label>
+            <select name="sede" id="sede" class="filtro-input">
+                <option value="">Todas</option>
+                {% for f in sede %}
+                <option value="{{ f }}" {% if request.GET.sedes == f %}selected{% endif %}>{{ f }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filtro-grupo-4">
+            <label for="diagnostico">DIAGNÓSTICO</label>
+            <select name="diagnostico" id="diagnostico" class="filtro-input">
+                <option value="">Todos</option>
+                {% for a in diagnostico %}
+                <option value="{{ a }}" {% if request.GET.diagnostico == a %}selected{% endif %}>{{ a }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filtro-grupo-4">
+            <button class="button-buscar" type="submit">
+                <i class="fas fa-search me-1"></i>BUSCAR
+            </button>
+        </div>
+        <div class="filtro-grupo-4">
+            <a href="{% url 'inmunoterapia:filtro_alergologia' %}" class="button-limpiar">
+                <i class="fas fa-eraser me-1"></i> LIMPIAR FILTROS
+            </a>
+        </div>
+    </form>
+</div>
+<div class="pagination">
+    <span class="step-links">
+        {%if pacientes.has_previous%}
+        <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page=1"><<</a>
+        <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ pacientes.previous_page_number }}"><</a>
+        {%endif%}
+        <span class="current">
+            Página {{ pacientes.number }} de {{ pacientes.paginator.num_pages }}
+        </span>
+        {%if pacientes.has_next%}
+        <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ pacientes.next_page_number }}">></a>
+        <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ pacientes.paginator.num_pages }}">>></a>
+        {%endif%}
+    </span>
+</div>
+<div class="tabla">
+    <div class="tabla-scroll2">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>FECHA FOLIO</th>
+                    <th>AÑO</th>
+                    <th>MES</th>
+                    <th>DOCUMENTO</th>
+                    <th>SEDE</th>
+                    <th>ACTIVIDAD</th>
+                    <th>DIAGNÓSTICO</th>
+                    <th>RESOLUCIÓN PACIENTE</th>
+                    <th>CLASIFICACIÓN</th>
+                    <th>USUARIO SEGUIMIENTO</th>
+                    <th>ACCIONES</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for p in pacientes %}
+                <tr>
+                    <td>{{ p.FECHA_FOLIO }}</td>
+                    <td>{{ p.AÑO_FOLIO }}</td>
+                    <td>{{ p.MES_FOLIO }}</td>
+                    <td>{{ p.DOCUMENTO }}</td>
+                    <td>{{ p.SEDE }}</td>
+                    <td>{{ p.ACTIVIDAD }}</td>
+                    <td>{{ p.DIAGNOSTICO }}</td>
+                    <td>{{ p.RESOLUCION_PACIENTE|default:"" }}</td>
+                    <td>{{ p.CLASIFICACION }}</td>
+                    <td>{{ p.USUARIO_INVITADO|default:"" }}</td>
+                    <td>
+                        <button href="#" class="btn-acciones btn-ver" data-id="{{ p.ID_SHARE }}" title="Ver histórico">
+                            <i class="bi bi-eye"></i> 
+                        </button>
+                        {% if p.CLASIFICACION == "Clasificado" %}
+                        {% if perms.inmunoterapia.editar_alergologia %}
+                        <button href="#" class="btn-acciones btn-editar" data-id="{{ p.ID_SHARE }}" title="Editar seguimiento">
+                            <i class="bi bi-pencil"></i> 
+                        </button>
+                        {%endif%}
+                        {% endif %}
+                        {% if p.CLASIFICACION == "No clasificado" %}
+                        {% if perms.inmunoterapia.agregar_alergologia %}
+                        <button href="#" class="btn-acciones btn-agregar" data-id="{{ p.ID_SHARE }}" title="Agregar seguimiento">
+                            <i class="bi bi-person-add"></i>
+                        </button>
+                        {%endif%}
+                        {% endif %}
+                    </td>
+                </tr>
+                {%empty%}
+                <tr>
+                    <td colspan="11" class="text-center">No se encontraron registros.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Ver histórico -->
+<div class="modal fade" id="seguimientoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-centered modal-lg">
+        <div class="modal-content"></div>
+    </div>
+</div>
+
+<!-- Modal Edición Alergología -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content"></div>
+  </div>
+</div>
+<div class="modal fade" id="agregarModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content"></div>
+  </div>
+</div>
+<script>
+    // Ver histórico
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-ver');
+        if (btn) {
+            e.preventDefault();
+            const ID_SHARE = btn.getAttribute('data-id');
+            if (!ID_SHARE) return;
+
+            const url = `/inmunoterapia/historial_alergologia/${ID_SHARE}/`;
+            const modalContentElement = document.querySelector("#seguimientoModal .modal-content");
+
+            modalContentElement.innerHTML = `
+                <div class="modal-body text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-3">Cargando información del seguimiento...</p>
+                </div>
+            `;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success){
+                        modalContentElement.innerHTML = data.html;
+                        const modalElement = document.getElementById("seguimientoModal");
+                        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+                        modal.show();
+                    } else {
+                        mostrarNotificacion("❌ " + (data.message || "No se pudo cargar la información."), true);
+                    }
+                })
+                .catch(err => {
+                    console.error('Error al cargar el contenido:', err);
+                    mostrarNotificacion("❌ No se pudo cargar la información.", true);
+                });
+        }
+    });
+
+    // Editar
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('.btn-editar');
+        if (btn) {
+            e.preventDefault();
+            const ID_SHARE = btn.getAttribute('data-id');
+            if (!ID_SHARE) return;
+
+            const url = `/inmunoterapia/cargar-edicion-alergologia/${ID_SHARE}/`;
+            const modalContentElement = document.querySelector("#editarModal .modal-content");
+
+            modalContentElement.innerHTML = `
+                <div class="modal-body text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-3">Cargando formulario...</p>
+                </div>
+            `;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        modalContentElement.innerHTML = data.html;
+                        const modalElement = document.getElementById("editarModal");
+                        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+                        modal.show();
+                        inicializarForm();
+                    } else {
+                        mostrarNotificacion("❌ Error al cargar el formulario", true);
+                    }
+                })
+                .catch(err => console.error("Error en fetch:", err));
+        }
+    });
+
+    // Inicializar formulario edición
+    function inicializarForm() {
+        const resolucionPaciente = document.getElementById("id_resolucion_paciente");
+        const observaciones2 = document.getElementById("observaciones");
+        const clasificacion = document.getElementById("id_clasificacion") || document.querySelector(".clasificacion");
+        const form = document.getElementById("form-edicion");
+
+        if (!form) {
+            console.warn("⚠️ No se encontró el formulario #form-edicion en el HTML del modal.");
+            return;
+        }
+
+        function actualizacionCampos() {
+            const val = (resolucionPaciente?.value || "").trim().toLowerCase();
+
+            if (observaciones2) observaciones2.disabled = true;
+            if (clasificacion) clasificacion.value = "No clasificado";
+
+            switch (val) {
+                case "pendiente inicio inmunoterapia":
+                case "paciente remitido con otra entidad":
+                case "inicio de biológico":
+                case "escalonamiento a junta médica":
+                case "entrenamiento con inmunoterapia":
+                case "en espera de resultado de pruebas":
+                case "en espera de mejoría por tratamiento farmacológico":
+                case "en espera de control con el alergólogo":
+                case "alta del paciente":
+                    if (clasificacion) clasificacion.value = "Clasificado";
+                    if (observaciones2) observaciones2.disabled = false;
+                    break;
+                case "seleccione":
+                default:
+                    if (clasificacion) clasificacion.value = "No clasificado";
+                    if (observaciones2) observaciones2.disabled = true;
+                    break;
+            }
+        }
+        // inicializar al cargar
+        actualizacionCampos();
+        if (resolucionPaciente) {
+            resolucionPaciente.addEventListener("change", actualizacionCampos);
+        }
+        // interceptar submit con AJAX
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            let url = form.action;
+            let formData = new FormData(form);
+            fetch(url, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": formData.get("csrfmiddlewaretoken")
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // cerrar modal
+                    const modalElement = document.getElementById("editarModal");
+                    const modal = bootstrap.Modal.getInstance(modalElement);
+                    modal.hide();
+                    // ✅ actualizar directamente la fila de la tabla
+                    const fila = document.querySelector(`button[data-id="${data.id}"]`).closest("tr");
+                    if (fila) {
+                        fila.querySelector("td:nth-child(8)").textContent = data.resolucion || ""; // col resolución
+                        fila.querySelector("td:nth-child(9)").textContent = data.clasificacion || ""; // col clasificación
+                    }
+                    // ✅ notificación flotante
+                    mostrarNotificacion("✅ El seguimiento fue guardado correctamente", false);
+                    // ✅ limpiar filtros y mandar a inicio (sin querystring)
+                    setTimeout(() => {
+                        window.location.href = "{% url 'inmunoterapia:filtro_alergologia' %}";
+                    }, 2000);
+                } else {
+                    mostrarNotificacion("❌ " + (data.message || "Error al guardar"), true);
+                }
+            })
+            .catch(err => {
+                console.error("Error en fetch:", err);
+                mostrarNotificacion("❌ Error al guardar", true);
+            });
+        });
+    }
+
+    // Función de notificación
+    function mostrarNotificacion(mensaje, esError = false) {
+        const notif = document.getElementById("notificacion");
+        notif.innerText = mensaje;
+        notif.classList.remove("d-none", "alert-success", "alert-danger");
+        notif.classList.add(esError ? "alert-danger" : "alert-success");
+        setTimeout(() => notif.classList.add("d-none"), 2500);
+    }
+</script>
+<script>
+    // Editar
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('.btn-agregar');
+        if (btn) {
+            e.preventDefault();
+            const ID_SHARE = btn.getAttribute('data-id');
+            if (!ID_SHARE) return;
+
+            const url = `/inmunoterapia/cargar-agregar-alergologia/${ID_SHARE}/`;
+            const modalContentElement = document.querySelector("#agregarModal .modal-content");
+
+            modalContentElement.innerHTML = `
+                <div class="modal-body text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-3">Cargando formulario...</p>
+                </div>
+            `;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        modalContentElement.innerHTML = data.html;
+                        const modalElement = document.getElementById("agregarModal");
+                        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+                        modal.show();
+                        inicializarForm2();
+                    } else {
+                        mostrarNotificacion2("❌ Error al cargar el formulario", true);
+                    }
+                })
+                .catch(err => console.error("Error en fetch:", err));
+        }
+    });
+
+    // Inicializar formulario edición
+    function inicializarForm2() {
+        const resolucionPaciente = document.getElementById("id_resolucion_paciente");
+        const observaciones2 = document.getElementById("observaciones");
+        const clasificacion = document.getElementById("id_clasificacion") || document.querySelector(".clasificacion");
+        const form = document.getElementById("form-agregar");
+
+        if (!form) {
+            console.warn("⚠️ No se encontró el formulario #form-edicion en el HTML del modal.");
+            return;
+        }
+
+        function actualizacionCampos2() {
+            const val = (resolucionPaciente?.value || "").trim().toLowerCase();
+
+            if (observaciones2) observaciones2.disabled = true;
+            if (clasificacion) clasificacion.value = "No clasificado";
+
+            switch (val) {
+                case "pendiente inicio inmunoterapia":
+                case "paciente remitido con otra entidad":
+                case "inicio de biológico":
+                case "escalonamiento a junta médica":
+                case "entrenamiento con inmunoterapia":
+                case "en espera de resultado de pruebas":
+                case "en espera de mejoría por tratamiento farmacológico":
+                case "en espera de control con el alergólogo":
+                case "alta del paciente":
+                    if (clasificacion) clasificacion.value = "Clasificado";
+                    if (observaciones2) observaciones2.disabled = false;
+                    break;
+                case "seleccione":
+                default:
+                    if (clasificacion) clasificacion.value = "No clasificado";
+                    if (observaciones2) observaciones2.disabled = true;
+                    break;
+            }
+        }
+        // inicializar al cargar
+        actualizacionCampos2();
+        if (resolucionPaciente) {
+            resolucionPaciente.addEventListener("change", actualizacionCampos2);
+        }
+        // interceptar submit con AJAX
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            let url = form.action;
+            let formData = new FormData(form);
+            fetch(url, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": formData.get("csrfmiddlewaretoken")
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // cerrar modal
+                    const modalElement = document.getElementById("agregarModal");
+                    const modal = bootstrap.Modal.getInstance(modalElement);
+                    modal.hide();
+                    // ✅ actualizar directamente la fila de la tabla
+                    const fila = document.querySelector(`button[data-id="${data.id}"]`).closest("tr");
+                    if (fila) {
+                        fila.querySelector("td:nth-child(8)").textContent = data.resolucion;
+                        fila.querySelector("td:nth-child(9)").textContent = data.clasificacion;
+                        fila.querySelector("td:nth-child(10)").textContent = data.usuario;
+                        fila.querySelector("td:nth-child(11)").textContent = data.fecha;
+                    }
+                    // ✅ notificación flotante
+                    mostrarNotificacion2("✅ El seguimiento fue guardado correctamente", false);
+                    // ✅ limpiar filtros y mandar a inicio (sin querystring)
+                    setTimeout(() => {
+                        window.location.href = "{% url 'inmunoterapia:filtro_alergologia' %}";
+                    }, 2000);
+                } else {
+                    mostrarNotificacion2("❌ " + (data.message || "Error al guardar"), true);
+                }
+            })
+            .catch(err => {
+                console.error("Error en fetch:", err);
+                mostrarNotificacion2("❌ Error al guardar", true);
+            });
+        });
+    }
+
+    // Función de notificación
+    function mostrarNotificacion2(mensaje, esError = false) {
+        const notif = document.getElementById("notificacion");
+        notif.innerText = mensaje;
+        notif.classList.remove("d-none", "alert-success", "alert-danger");
+        notif.classList.add(esError ? "alert-danger" : "alert-success");
+        setTimeout(() => notif.classList.add("d-none"), 2500);
+    }
+</script>
+{%endblock%}

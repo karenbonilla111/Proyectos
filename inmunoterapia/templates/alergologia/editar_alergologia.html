@@ -1,0 +1,97 @@
+<form class="formulario2" id="form-edicion" method="POST"
+action="{% url 'inmunoterapia:guardar_edicion_alergologia' paciente.ID_SHARE %}">
+  {% csrf_token %}
+
+  <div class="modal-header text-white" style="background-color: rgba(0, 102, 154, 1);">
+    <h5 class="modal-title">Editar seguimiento</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+  </div>
+    <div class="modal-body">
+        <input type="hidden" name="id" value="{{ paciente.ID_SHARE }}">
+
+        <div class="row mb-2">
+            <div class="col-6"><strong>FOLIO</strong></div>
+            <div class="col-6">{{ paciente.FOLIO}}</div>
+            <div class="col-6"><strong>FECHA FOLIO:</strong></div>
+            <div class="col-6">{{ paciente.FECHA_FOLIO}}</div>
+            <div class="col-6"><strong>MES FOLIO:</strong></div>
+            <div class="col-6">{{ paciente.MES_FOLIO}}</div>
+            <div class="col-6"><strong>AÑO FOLIO:</strong></div>
+            <div class="col-6">{{ paciente.AÑO_FOLIO}}</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-6"><strong>DOCUMENTO:</strong></div>
+            <div class="col-6">{{ paciente.DOCUMENTO}}</div>
+            <div class="col-6"><strong>SEDE:</strong></div>
+            <div class="col-6">{{ paciente.SEDE}}</div>
+            <div class="col-6"><strong>ACTIVIDAD:</strong></div>
+            <div class="col-6">{{ paciente.ACTIVIDAD}}</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-6"><strong>CODIGO DIAGNOSTICO:</strong></div>
+            <div class="col-6">{{ paciente.CODIGO_DIGNOSTICO}}</div>
+            <div class="col-6"><strong>DIAGNOSTICO</strong></div>
+            <div class="col-6">{{ paciente.DIAGNOSTICO}}</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-6"><strong>PRUEBA PRICK:</strong></div>
+            <div class="col-6">{{ paciente.PRUEBA_PRICK}}</div>
+            <div class="col-6"><strong>PRUEBA PARCHE ALIMENTOS MEDICAMENTOS:</strong></div>
+            <div class="col-6">{{ paciente.PRUEBA_PARCHE_ALIMENTOS_MEDICAMENTOS}}</div>
+            <div class="col-6"><strong>PRUEBA ALIMENTOS MENORES A 2 AÑOS:</strong></div>
+            <div class="col-6">{{ paciente.PRUEBA_ALIMENTOS_MENORES_A_2_AÑOS}}</div>
+            <div class="col-6"><strong>PRUEBA PARCHE BATERÍA ESTÁNDAR:</strong></div>
+            <div class="col-6">{{ paciente.PRUEBA_PARCHE_BATERIA_ESTANDAR}}</div> 
+        </div>
+        <div class="row mb-2">
+            <div class="col-6"><strong>PRUEBA CUTÁNEA AEROALERGENOS:</strong></div>
+            <div class="col-6">{{ paciente.PRUEBA_CUTANEA_AEROALERGENOS}}</div>
+            <div class="col-6"><strong>PRUEBA CUTÁNEA ALIMENTOS:</strong></div>
+            <div class="col-6">{{ paciente.PRUEBA_CUTANEA_ALIMENTOS}}</div>
+            <div class="col-6"><strong>PRUEBA PROVOCACIÓN MEDICAMENTO:</strong></div>
+            <div class="col-6">{{ paciente.PRUEBA_PROVOCACION_MEDICAMENTO}}</div>
+            <div class="col-6"><strong>PRUEBA PROVOCACIÓN ALIMENTO:</strong></div>
+            <div class="col-6">{{ paciente.PRUEBA_PROVOCACION_ALIMENTO}}</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-6"><strong>INMUNOTERAPIA:</strong></div>
+            <div class="col-6">{{ paciente.INMUNOTERAPIA}}</div>
+            <div class="col-6"><strong>MEDICAMENTO:</strong></div>
+            <div class="col-6">{{ paciente.MEDICAMENTOS_INMUNOTERAPIA|default:""}}</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-6"><strong>TRATAMIENTO FARMACOLÓGICO:</strong></div>
+            <div class="col-6">{{ paciente.TRATAMIENTO_FARMACOLOGICO|default:""}}</div>
+            <div class="col-6"><strong>FECHA DE ULTIMA INMUNOTERAPIA:</strong></div>
+            <div class="col-6">{{ paciente.FECHA_ULTIMA_INMUNOTERAPIA|default:""}}</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-6">
+                <label class="form-label"><strong>RESOLUCIÓN PACIENTE:</strong></label>
+                <select name="resolucion_paciente" id="id_resolucion_paciente" class="form-select" required>
+                    <option value="">Seleccione</option>
+                    {%for opcion in resolucion_paciente %}
+                    <option value="{{opcion}}" {%if paciente.RESOLUCION_PACIENTE|default:'' == opcion %}selected{%endif%}>
+                        {{ opcion }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6">
+                <label class="form-label"><strong>CLASIFICACION:</strong></label>
+                <input type="text" class="clasificacion form-control" value="{{paciente.CLASIFICACION}}" readonly>
+            </div>
+            <div class="col-6"><strong>USUARIO INVITADO:</strong></div>
+            <div class="col-6">{{paciente.USUARIO_INVITADO|default:""}}</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-6">
+                <label class="form-label"><strong>OBSERVACIONES GENERALES:</strong></label>
+                <textarea id="observaciones" name="observaciones" class="form-control">{{paciente.OBSERVACIONES_GENERALES|default:""}}</textarea>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer2 d-flex justify-content-between align-items-center">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </div>
+</form>

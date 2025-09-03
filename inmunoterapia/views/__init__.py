@@ -1,0 +1,4 @@
+from .inmunoterapia_views import inicio_inmunoterapia, lista_inmunoterapia, historico_inmunoterapia, cargar_edicion_inmunoterapia, guardar_edicion_inmunoterapia, cargar_agregar_inmunoterapia, guardar_agregar_inmunoterapia
+
+# vistas AJAX
+from .alergologia_views import inicio_alergologia, filtro_alergologia, historial_alergologia, cargar_edicion_alergologia, guardar_edicion_alergologia, cargar_agregar_alergologia, guardar_agregar_alergologia
